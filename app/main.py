@@ -1,17 +1,19 @@
+import os
 from typing import AsyncGenerator
+
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 
 import motor.motor_asyncio
 
-from app.config import Settings
 from app.routes import router 
 
+
 @asynccontextmanager
-async def lifespan(app: FastAPI, settings:Settings) -> AsyncGenerator:
-    client = motor.motor_asyncio.AsyncIOMotorClient(settings.MONGO_URI)
-    db = client[settings.MONGO_DB_NAME]
+async def lifespan(app: FastAPI) -> AsyncGenerator:
+    client = motor.motor_asyncio.AsyncIOMotorClient(os.environ.get("MONGO_URI"))
+    db = client[os.environ.get("MONGO_DB_NAME")]
     app.state.db = db
 
     yield  # This represents the running FastAPI app
@@ -19,13 +21,13 @@ async def lifespan(app: FastAPI, settings:Settings) -> AsyncGenerator:
     client.close()
 
 
-def create_app(settings: Settings):
+def create_app():
     app = FastAPI(
-        title=settings.PROJECT_NAME,
-        version=settings.VERSION,
+        title="FastAPI Title",
+        version="1.2.1",
         docs_url="/",
-        description=settings.DESCRIPTION,
-        lifespan=lambda app: lifespan(app, settings)
+        description="DESCRIPTION",
+        lifespan=lambda app: lifespan(app)
     )
 
     origins = ["*"]

@@ -1,10 +1,8 @@
 from typing import Union
 
 from app import main
-from app.config import settings
 
-app = main.create_app(settings)
-
+app = main.create_app()
 
 @app.get("/")
 def read_root():
