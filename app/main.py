@@ -13,7 +13,7 @@ from app.routes import router
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     client = motor.motor_asyncio.AsyncIOMotorClient(os.environ.get("MONGO_URI"))
-    db = client[os.environ.get("MONGO_DB_NAME")]
+    db = client["bookdb"]
     app.state.db = db
 
     yield  # This represents the running FastAPI app
