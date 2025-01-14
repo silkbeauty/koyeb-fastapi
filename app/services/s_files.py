@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import List
-
+from fastapi import Request
 
 def clean_files(folder_path: str) -> List[str]:
     folder_path = Path(folder_path)
@@ -28,3 +28,27 @@ def clean_files(folder_path: str) -> List[str]:
             file.rename(new_file_path)
 
     return [file.name for file in folder_path.iterdir() if file.is_file()]
+
+
+def get_filename_from_folder(folder_path: str) -> List[str]:
+    folder_path = Path(folder_path)
+    if not folder_path.exists() or not folder_path.is_dir():
+        raise FileNotFoundError(f"Folder {folder_path} not found.")
+    
+    filenames = [
+        file.name for file in  folder_path.iterdir() if file.is_file()
+    ]
+    
+    return filenames
+
+
+def save_files_to_mongo(request: Request, filenames: List[str]):
+    documents = [{"book_name": filename} for filename in filenames]
+    print(documents)
+    if documents:
+        for doc in documents:
+            print("-------------4---------")
+            # print(request.app.state.books_collection)
+            request.app.state.books_collection.update_one(
+                {"book_name": doc["book_name"]}, {"$setOnInsert": doc}, upsert=True
+            )

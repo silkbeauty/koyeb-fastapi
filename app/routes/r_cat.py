@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
-router = APIRouter()
 
 from app.services import s_files
+
+router = APIRouter()
 
 @router.get('/clean_numbering_list_files')
 def list_files_endpoint(folder_name: str):
